@@ -1,3 +1,5 @@
+#ifndef LIBRARY
+#define LIBRARY
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -12,13 +14,12 @@ struct Line{
     int first_x, first_y, second_x, second_y;
 };
 
-#ifndef ALGORITHMS_H
-#define ALGORITHMS_H
-
-map<string, vector<Line>> z(vector<vector<char>> grid, vector<string> dict);
-map<string, vector<Line>> kmp(vector<vector<char>> grid, vector<string> dict);
-map<string, vector<Line>> bf(vector<vector<char>> grid, vector<string> dict);
-map<string, vector<Line>> bm(vector<vector<char>> grid, vector<string> dict);
-map<string, vector<Line>> rk(vector<vector<char>> grid, vector<string> dict);
+map<string, vector<Line>> z(vector<vector<char>> grid, vector<string> dict, string& name, int& cmp_cnt);
+map<string, vector<Line>> kmp(vector<vector<char>> grid, vector<string> dict, string& name, int& cmp_cnt);
+map<string, vector<Line>> bf(vector<vector<char>> grid, vector<string> dict, string& name, int& cmp_cnt);
+map<string, vector<Line>> bm(vector<vector<char>> grid, vector<string> dict, string& name, int& cmp_cnt);
+map<string, vector<Line>> rk(vector<vector<char>> grid, vector<string> dict, string& name, int& cmp_cnt);
+unordered_map<string, function<map<string, vector<Line>>(vector<vector<char>> grid, vector<string> dict, string& name, int& cmp_cnt)>> 
+    algorithms {{"z", z}, {"kmp", kmp}, {"bm", bm}, {"bf", bf}, {"rk", rk}};
 
 #endif

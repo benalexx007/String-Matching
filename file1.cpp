@@ -3,12 +3,8 @@
 using namespace std;
 
 int main(int argc, char* argv[]){
-    unordered_map<string, function<map<string, vector<Line>>(vector<vector<char>> grid, vector<string> dict)>> algorithms;
-    algorithms["z"] = z;
-    algorithms["kmp"] = kmp;
-    algorithms["bf"] = bf;
-    algorithms["bm"] = bm;
-    algorithms["rk"] = rk;
+    unordered_map<string, function<map<string, vector<Line>>(vector<vector<char>> grid, vector<string> dict, string& name, int& cmp_cnt)>> 
+        algorithms {{"z", z}, {"kmp", kmp}, {"bm", bm}, {"bf", bf}, {"rk", rk}};
     string in, out, algo;
     for(int i=1; i<argc; ++i){
         string arg = argv[i];
