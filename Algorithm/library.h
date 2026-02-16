@@ -19,7 +19,5 @@ map<string, vector<Line>> kmp(vector<vector<char>> grid, vector<string> dict, st
 map<string, vector<Line>> bf(vector<vector<char>> grid, vector<string> dict, string& name, int& cmp_cnt);
 map<string, vector<Line>> bm(vector<vector<char>> grid, vector<string> dict, string& name, int& cmp_cnt);
 map<string, vector<Line>> rk(vector<vector<char>> grid, vector<string> dict, string& name, int& cmp_cnt);
-unordered_map<string, function<map<string, vector<Line>>(vector<vector<char>> grid, vector<string> dict, string& name, int& cmp_cnt)>> 
-    algorithms {{"z", z}, {"kmp", kmp}, {"bm", bm}, {"bf", bf}, {"rk", rk}};
 
 #endif
