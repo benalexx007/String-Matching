@@ -1,5 +1,5 @@
 #include "library.h"
-void run(const string in, const string out, const function<map<string, vector<Line>>(vector<vector<char>> grid, vector<string> dict, string& name, int& cmp_cnt)> algo){
+void run(const string in, const string out, const function<map<string, vector<Line>>(string toSearch, vector<string> dict, string& name, int& cmp_cnt)> algo){
     int n, m, w;
     ifstream fin(in);
     fin>> n >> m;
@@ -13,6 +13,17 @@ void run(const string in, const string out, const function<map<string, vector<Li
         }
         grid.push_back(row);
     }
+    string toSearch;
+    for(int i=0; i<n; i++){
+       for(int j=0; j<m; j++)
+            toSearch += grid[i][j];
+        toSearch += char(0);
+    }
+    for(int i=0; i<m; i++){
+       for(int j=0; j<n; j++)
+            toSearch += grid[j][i];
+        toSearch += char(0);
+    }
     fin >> w;
     vector<string> dict;
     for(int i=0; i<w; i++){
@@ -24,7 +35,7 @@ void run(const string in, const string out, const function<map<string, vector<Li
     string name = "";
     int cmp_cnt= 0;
     auto start = chrono::high_resolution_clock::now();
-    map<string, vector<Line>> store = algo(grid, dict, name, cmp_cnt);
+    map<string, vector<Line>> store = algo(toSearch, dict, name, cmp_cnt);
     auto stop = chrono::high_resolution_clock::now();
     chrono::duration<double, milli> duration = stop - start;
     ofstream fout(out);
