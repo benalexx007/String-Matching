@@ -3,7 +3,7 @@
 using namespace std;
 
 int main(int argc, char* argv[]){
-    unordered_map<string, function<map<string, vector<Line>>(string toSearch, vector<string> dict, string& name, int& cmp_cnt)>> 
+    unordered_map<string, function<vector<pair<int, int>>(string toSearch, string target, string& name, int& cmp_cnt)>> 
         algorithms {{"z", z}, {"kmp", kmp}, {"bm", bm}, {"bf", bf}, {"rk", rk}};
     string in, out, algo;
     for(int i=1; i<argc; ++i){

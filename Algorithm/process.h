@@ -1,5 +1,5 @@
 #include "library.h"
-void run(const string in, const string out, const function<map<string, vector<Line>>(string toSearch, vector<string> dict, string& name, int& cmp_cnt)> algo){
+void run(const string in, const string out, const function<vector<pair<int, int>>(string toSearch, string target, string& name, int& cmp_cnt)> algo){
     int n, m, w;
     ifstream fin(in);
     fin>> n >> m;
@@ -13,17 +13,6 @@ void run(const string in, const string out, const function<map<string, vector<Li
         }
         grid.push_back(row);
     }
-    string toSearch;
-    for(int i=0; i<n; i++){
-       for(int j=0; j<m; j++)
-            toSearch += grid[i][j];
-        toSearch += char(0);
-    }
-    for(int i=0; i<m; i++){
-       for(int j=0; j<n; j++)
-            toSearch += grid[j][i];
-        toSearch += char(0);
-    }
     fin >> w;
     vector<string> dict;
     for(int i=0; i<w; i++){
@@ -35,7 +24,29 @@ void run(const string in, const string out, const function<map<string, vector<Li
     string name = "";
     int cmp_cnt= 0;
     auto start = chrono::high_resolution_clock::now();
-    map<string, vector<Line>> store = algo(toSearch, dict, name, cmp_cnt);
+    map<string, vector<Line>> store;
+    for(int i=0; i<n; i++){
+        string toSearch;
+        for(int j=0; j<m; j++)
+            toSearch += grid[i][j];
+        for(auto target : dict){
+            vector<pair<int, int>> index = algo(toSearch, target, name, cmp_cnt);
+            if(!index.empty())
+                for(auto k : index)
+                    store[target].push_back({i, k.first, i, k.second});
+        }
+    }
+    for(int i=0; i<m; i++){
+        string toSearch;
+        for(int j=0; j<n; j++)
+            toSearch += grid[j][i];
+        for(auto target : dict){
+            vector<pair<int, int>> index = algo(toSearch, target, name, cmp_cnt);
+            if(!index.empty())
+                for(auto k : index)
+                    store[target].push_back({k.first,i, k.second, i});
+        }
+    }
     auto stop = chrono::high_resolution_clock::now();
     chrono::duration<double, milli> duration = stop - start;
     ofstream fout(out);
@@ -51,4 +62,5 @@ void run(const string in, const string out, const function<map<string, vector<Li
     fout << "Algorithm: " <<  name << '\n';
     fout << "Comparisons: " << cmp_cnt << '\n';
     fout << "Execution Time: " << duration.count() << "ms\n";
+    fout.close();
 }
