@@ -1,5 +1,5 @@
-#ifndef LIBRARY
-#define LIBRARY
+#ifndef LIBRARY_SM
+#define LIBRARY_SM
 #include <string>
 #include <utility>
 #include <unordered_map>

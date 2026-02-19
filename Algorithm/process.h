@@ -13,6 +13,17 @@ void run(const string in, const string out, const function<vector<pair<int, int>
         }
         grid.push_back(row);
     }
+    string toSearch;
+    for(int i=0; i<n; i++){
+       for(int j=0; j<m; j++)
+            toSearch += grid[i][j];
+        toSearch += char(0);
+    }
+    for(int i=0; i<m; i++){
+       for(int j=0; j<n; j++)
+            toSearch += grid[j][i];
+        toSearch += char(0);
+    }
     fin >> w;
     vector<string> dict;
     for(int i=0; i<w; i++){
