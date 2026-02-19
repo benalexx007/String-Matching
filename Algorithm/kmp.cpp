@@ -1,5 +1,5 @@
 #include "library.h"
 
-map<string, vector<Line>> kmp(string toSearch, vector<string> dict, string& name, int& cmp_cnt){
+vector<pair<int, int>> kmp(string toSearch, string target, string& name, int& cmp_cnt){
 
 }
