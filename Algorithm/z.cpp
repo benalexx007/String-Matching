@@ -1,5 +1,5 @@
 #include "library.h"
 
-map<string, vector<Line>> z(vector<vector<char>> grid, vector<string> dict, string& name, int& cmp_cnt){
+vector<pair<int, int>> z(string toSearch, string target, string& name, int& cmp_cnt){
 
 }

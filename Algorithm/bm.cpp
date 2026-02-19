@@ -1,5 +1,5 @@
 #include "library.h"
 
-map<string, vector<Line>> bm(vector<vector<char>> grid, vector<string> dict, string& name, int& cmp_cnt){
+vector<pair<int, int>> bm(string toSearch, string target, string& name, int& cmp_cnt){
 
 }
