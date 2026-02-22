@@ -1,0 +1,54 @@
+ijkrynr: (0, 0) -> (0, 6); 
+ned: (0, 63) -> (0, 65); (1, 1) -> (1, 3); (73, 21) -> (75, 21); 
+rdmbru: not found
+nbrhha: not found
+hifwqci: not found
+yiyyor: not found
+xjaga: (3, 0) -> (3, 4); 
+kezatctd: (0, 2) -> (7, 2); 
+xjagaflh: (3, 0) -> (3, 7); 
+onziesrz: (2, 0) -> (2, 7); 
+jnnj: (0, 1) -> (3, 1); 
+tmrms: not found
+kezat: (0, 2) -> (4, 2); 
+nnj: (5, 24) -> (5, 26); (81, 35) -> (81, 37); (1, 1) -> (3, 1); (60, 56) -> (62, 56); 
+sttt: (4, 1) -> (4, 4); 
+yreatlqk: (0, 4) -> (7, 4); 
+rizho: not found
+jnnjsbjk: (0, 1) -> (7, 1); 
+ezat: (1, 2) -> (4, 2); 
+rdigtcc: (0, 3) -> (6, 3); 
+rinhxtuu: not found
+iihtpu: not found
+zwklqnom: not found
+jdlriuth: not found
+inq: (14, 65) -> (14, 67); (70, 95) -> (70, 97); (92, 59) -> (94, 59); 
+lgbhrsoo: not found
+qvrgspmc: not found
+mqf: not found
+iaofqjhy: not found
+wjcjmofh: not found
+aqmbth: not found
+angghvw: not found
+izpcpe: not found
+ktjir: not found
+empad: not found
+jjq: not found
+mmrgsbd: not found
+jwk: (68, 74) -> (70, 74); 
+mrfm: not found
+wqnmizi: not found
+vqp: (44, 77) -> (44, 79); 
+ihnt: not found
+wubb: not found
+bpha: not found
+gshcbtg: not found
+dhbzczvl: not found
+ylpm: not found
+ytgqrbkr: not found
+gfftqin: not found
+wuzyyqu: not found
+-----------------------------------
+Algorithm: Boyer-Moore
+Comparisons: 325226
+Execution Time: 8.0791ms

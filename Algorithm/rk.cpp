@@ -10,7 +10,7 @@ bool checkString(const string& toSearch, const string& target, int start, int le
 }
 
 vector<pair<int, int>> rk(string toSearch, string target, string& name, int& cmp_cnt) {
-    name = "rk"; vector<pair<int, int>> res; // result
+    name = "Rabin-Karp"; vector<pair<int, int>> res; // result
 
     const long long radix = 91138233;
     const long long q = 1e9 + 7; // prime number for hasing
