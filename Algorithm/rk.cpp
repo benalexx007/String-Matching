@@ -1,6 +1,6 @@
 #include "library.h" 
 
-//check mathcing chars
+//check maching chars
 bool checkString(const string& toSearch, const string& target, int start, int len, int& cmp_cnt) {
     for (int i = 0; i < len; ++i) {
         ++cmp_cnt;
@@ -12,7 +12,7 @@ bool checkString(const string& toSearch, const string& target, int start, int le
 vector<pair<int, int>> rk(string toSearch, string target, string& name, int& cmp_cnt) {
     name = "rk"; vector<pair<int, int>> res; // result
 
-    const long long radix = 91138233; // bc the test only has lowercase english letter
+    const long long radix = 91138233;
     const long long q = 1e9 + 7; // prime number for hasing
 
     const long long SEARCH_LEN = toSearch.size();
@@ -27,7 +27,7 @@ vector<pair<int, int>> rk(string toSearch, string target, string& name, int& cmp
     long long targetNum = 0;
     long long curSearch = 0;
 
-    // hashing m first chars in toSearch an hashing target
+    // hashing m first chars in toSearch and hashing target
     for (int i = 0; i < TARGET_LEN; ++i) {
         targetNum = (radix * targetNum + target[i]) % q;
         curSearch = (radix * curSearch + toSearch[i]) % q;
