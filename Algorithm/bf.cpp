@@ -1,7 +1,7 @@
 #include "library.h"
 
 vector<pair<int, int>> bf(string toSearch, string target, string& name, int& cmp_cnt) {
-    name = "bf";
+    name = "Brute Force";
     
     vector<pair<int, int>> matches;
     int n = toSearch.length();
