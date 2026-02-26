@@ -1,108 +1,98 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <fstream>
+#include <random>
+#include <algorithm>
+#include <filesystem>
+
 using namespace std;
+namespace fs = std::filesystem;
 
-mt19937 rd(chrono::steady_clock::now().time_since_epoch().count());
+mt19937 rd(42); 
+int RAND(int l, int r) { return uniform_int_distribution<int>(l, r)(rd); }
 
-// Hàm RAND an toàn hơn, kiểm tra nếu l > r thì hoán đổi hoặc trả về l
-int RAND(int l, int r) {
-    if (l > r) return l; 
-    return l + rd() % (r - l + 1);
+// Sinh Master Grid lớn nhất (500x500)
+vector<vector<char>> generateMasterGrid(int size, string alphabet) {
+    vector<vector<char>> grid(size, vector<char>(size));
+    for (int i = 0; i < size; i++)
+        for (int j = 0; j < size; j++)
+            grid[i][j] = alphabet[RAND(0, alphabet.size() - 1)];
+    return grid;
 }
 
-const int MAX_R = 500;
-const int MAX_C = 500;
-const int MAX_K = 100;
+// Hàm sinh từ khóa theo yêu cầu độ khó và độ dài
+string generateKeyword(const vector<vector<char>>& grid, int gridR, int gridC, string alphabet, int type, int minLen, int maxLen) {
+    int len = RAND(minLen, maxLen);
+    int r = RAND(0, gridR - 1);
+    int c = RAND(0, max(0, gridC - len));
+    string s = "";
 
-char masterGrid[MAX_R][MAX_C];
-vector<string> masterKeywords;
-
-void generateMasterData() {
-    for (int i = 0; i < MAX_R; i++) {
-        for (int j = 0; j < MAX_C; j++) {
-            masterGrid[i][j] = (char)('a' + RAND(0, 25));
-        }
+    if (type == 0) { // Near-miss Not Found (Hard)
+        for (int l = 0; l < len - 1; l++) s += grid[r][c + l];
+        char wrong;
+        do { wrong = alphabet[RAND(0, alphabet.size() - 1)]; } while (wrong == grid[r][c + len - 1]);
+        s += wrong;
+    } else { // Found (Hard/Easy)
+        for (int l = 0; l < len; l++) s += grid[r][c + l];
     }
+    return s;
+}
 
-    for (int i = 0; i < MAX_K; i++) {
-        if (RAND(1, 100) <= 70) {
-            int len = RAND(3, 8);
-            int direction = RAND(0, 1); 
-            string s = "";
+// Hàm sinh danh sách từ khóa tích lũy (Cumulative Dictionary)
+vector<string> generateCumulativeDict(int totalCount, const vector<vector<char>>& grid, int gridR, int gridC, string alphabet, double minScale, double maxScale) {
+    vector<string> dict;
+    int minLen = gridC * minScale;
+    int maxLen = gridC * maxScale;
+    if (minLen < 1) minLen = 1;
 
-            if (direction == 0) { // Ngang
-                // SỬA LỖI: Đảm bảo r, c không vượt quá giới hạn grid và len
-                int r = (i < 20) ? RAND(0, 4) : RAND(0, MAX_R - 1);
-                // Giới hạn c sao cho c + len không vượt quá MAX_C
-                int c = (i < 20) ? RAND(0, max(0, 5 - len)) : RAND(0, MAX_C - len);
-                
-                for (int l = 0; l < len; l++) s += masterGrid[r % MAX_R][(c + l) % MAX_C];
-            } 
-            else { // Dọc
-                int r = (i < 20) ? RAND(0, max(0, 5 - len)) : RAND(0, MAX_R - len);
-                int c = (i < 20) ? RAND(0, 4) : RAND(0, MAX_C - 1);
+    int notFound = totalCount * 0.3;
+    int found = totalCount - notFound;
+    int hardFound = found * 0.8;
 
-                for (int l = 0; l < len; l++) s += masterGrid[(r + l) % MAX_R][c % MAX_C];
-            }
-            masterKeywords.push_back(s);
-        } 
-        else {
-            string s = "";
-            int len = RAND(3, 8);
-            for (int l = 0; l < len; l++) s += (char)('a' + RAND(0, 25));
-            masterKeywords.push_back(s);
-        }
+    vector<int> types;
+    for(int i=0; i<notFound; i++) types.push_back(0);
+    for(int i=0; i<hardFound; i++) types.push_back(1);
+    for(int i=0; i<(found - hardFound); i++) types.push_back(2);
+    shuffle(types.begin(), types.end(), rd);
+
+    for(int type : types) {
+        dict.push_back(generateKeyword(grid, gridR, gridC, alphabet, type, minLen, maxLen));
     }
+    return dict;
+}
+
+void saveTest(string path, int r, int c, const vector<vector<char>>& masterGrid, const vector<string>& dict, int dictCount) {
+    fs::create_directories(fs::path(path).parent_path());
+    ofstream out(path);
+    out << r << " " << c << "\n";
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) out << masterGrid[i][j] << (j == c - 1 ? "" : " ");
+        out << "\n";
+    }
+    out << dictCount << "\n";
+    for (int i = 0; i < dictCount; i++) out << dict[i] << "\n";
+    out.close();
 }
 
 int main() {
-    generateMasterData();
-    ofstream out("BIG_TEST.txt");
-    
-    if (!out.is_open()) {
-        cerr << "Error: Could not open file for writing!" << endl;
-        return 1;
-    }
-    
-    // Scenario 1: Tăng Grid Size
-    vector<int> sizes = {10, 250, 500};
-    int fixedK = 10; 
+    string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+    auto masterGrid = generateMasterGrid(500, ALPHABET);
 
-    for (int s : sizes) {
-        out << s << " " << s << "\n";
-        for (int i = 0; i < s; i++) {
-            for (int j = 0; j < s; j++) {
-                out << masterGrid[i][j] << (j == s - 1 ? "" : " ");
-            }
-            out << "\n";
-        }
-        out << fixedK << "\n";
-        for (int i = 0; i < fixedK; i++) {
-            out << masterKeywords[i] << "\n";
-        }
-        out << "\n"; 
-    }
+    // --- SCENARIO 1: Dictionary cố định (250 từ), Grid tăng dần ---
+    // Từ khóa phải khớp Grid 10x10 đầu tiên, độ dài 8-10 ký tự.
+    auto s1_master_dict = generateCumulativeDict(250, masterGrid, 10, 10, ALPHABET, 0.8, 1.0);
+    saveTest("Input/Scenario 1/small.txt", 10, 10, masterGrid, s1_master_dict, 250);
+    saveTest("Input/Scenario 1/medium.txt", 250, 250, masterGrid, s1_master_dict, 250);
+    saveTest("Input/Scenario 1/large.txt", 500, 500, masterGrid, s1_master_dict, 250);
 
-    // Scenario 2: Tăng số từ khóa
-    int fixedSize = 100;
-    vector<int> kValues = {10, 50, 100};
+    // --- SCENARIO 2: Grid cố định (250x250), Dictionary tăng dần (10 -> 250 -> 500) ---
+    // Từ khóa đạt 80-100% Grid (200-250 ký tự).
+    auto s2_master_dict = generateCumulativeDict(500, masterGrid, 250, 250, ALPHABET, 0.8, 1.0);
+    saveTest("Input/Scenario 2/small.txt", 250, 250, masterGrid, s2_master_dict, 10);
+    saveTest("Input/Scenario 2/medium.txt", 250, 250, masterGrid, s2_master_dict, 250);
+    saveTest("Input/Scenario 2/large.txt", 250, 250, masterGrid, s2_master_dict, 500);
 
-    for (int k : kValues) {
-        out << fixedSize << " " << fixedSize << "\n";
-        for (int i = 0; i < fixedSize; i++) {
-            for (int j = 0; j < fixedSize; j++) {
-                out << masterGrid[i][j] << (j == fixedSize - 1 ? "" : " ");
-            }
-            out << "\n";
-        }
-        out << k << "\n";
-        // Lấy từ khóa từ đầu danh sách để đảm bảo tính nhất quán
-        for (int i = 0; i < k; i++) {
-            out << masterKeywords[i] << "\n";
-        }
-        out << "\n";
-    }
-
-    out.close();
-    cout << "Generated BIG_TEST.txt successfully." << endl;
+    cout << "Success: Generated cumulative tests with long keywords (80-100% grid size)." << endl;
     return 0;
 }
