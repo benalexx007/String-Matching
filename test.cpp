@@ -21,6 +21,12 @@ static const int kMaxDict = 200;
 static const int kBenchScenario1K = kMaxDict;
 static const int kBenchScenario2Grid = 250;
 
+// Guarantee for "not found" keywords:
+// We deliberately exclude kAbsentChar from every generated grid. Then every type=0 keyword
+// will contain kAbsentChar, making it impossible to appear anywhere in the grid (horiz/vert).
+static const char kAbsentChar = 'z';
+static const char* kGridAlphabet = "abcdefghijklmnopqrstuvwxy"; // excludes 'z'
+
 static int RAND(mt19937& rd, int l, int r) { return uniform_int_distribution<int>(l, r)(rd); }
 
 vector<vector<char>> generateRandomGrid(int n, const string& alphabet, mt19937& rd) {
@@ -97,27 +103,52 @@ vector<vector<char>> generateDuplicateGrid(int n, const string& alphabet, mt1993
 }
 
 vector<vector<char>> generateSpiralGrid(int n, const string& alphabet, mt19937& rd) {
+    // Spiral mode should be measurably different from random for horizontal/vertical searches.
+    // We fill the grid in spiral layers, but each layer uses a fixed character (cycling over a
+    // small subset of the alphabet). This creates long repeated runs in rows/cols, which tends
+    // to be a bad case for naive brute force (many long partial matches).
     vector<vector<char>> grid(n, vector<char>(n));
-    const int A = (int)alphabet.size() - 1;
+
+    const int cycle = min<int>(4, (int)alphabet.size()); // small cycle to amplify repetition
     int top = 0, bottom = n - 1, left = 0, right = n - 1;
+    int layer = 0;
     while (top <= bottom && left <= right) {
+        char ch = alphabet[layer % cycle];
+
         for (int j = left; j <= right; j++)
-            grid[top][j] = alphabet[RAND(rd, 0, A)];
+            grid[top][j] = ch;
         top++;
+
         for (int i = top; i <= bottom; i++)
-            grid[i][right] = alphabet[RAND(rd, 0, A)];
+            grid[i][right] = ch;
         right--;
+
         if (top <= bottom) {
             for (int j = right; j >= left; j--)
-                grid[bottom][j] = alphabet[RAND(rd, 0, A)];
+                grid[bottom][j] = ch;
             bottom--;
         }
+
         if (left <= right) {
             for (int i = bottom; i >= top; i--)
-                grid[i][left] = alphabet[RAND(rd, 0, A)];
+                grid[i][left] = ch;
             left++;
         }
+
+        layer++;
     }
+
+    // Add tiny noise so different seeds still differ, but keep the spiral structure dominant.
+    // (Noise is optional; keep it very low.)
+    if (n >= 3) {
+        int flips = max(1, n / 50);
+        for (int t = 0; t < flips; t++) {
+            int r = RAND(rd, 0, n - 1);
+            int c = RAND(rd, 0, n - 1);
+            grid[r][c] = alphabet[RAND(rd, 0, (int)alphabet.size() - 1)];
+        }
+    }
+
     return grid;
 }
 
@@ -136,6 +167,7 @@ vector<vector<char>> makeGrid(int mode, int n, const string& alphabet, mt19937& 
 
 string generateKeyword(const vector<vector<char>>& grid, int gridR, int gridC, const string& alphabet, int type,
                        int minLen, int maxLen, mt19937& rd) {
+    (void)alphabet; // kept for compatibility; type=0 uses kAbsentChar, type>0 reads from grid
     int len = RAND(rd, minLen, maxLen);
     int direction = RAND(rd, 0, 1);
 
@@ -156,13 +188,10 @@ string generateKeyword(const vector<vector<char>>& grid, int gridR, int gridC, c
             else
                 s += grid[r + l][c];
         }
-        char wrong;
+        // Absolute "not found": inject a character that does not exist in the grid at all.
+        // (We generate grids without kAbsentChar.)
         char correct = (direction == 0) ? grid[r][c + len - 1] : grid[r + len - 1][c];
-        const int A = (int)alphabet.size() - 1;
-        do {
-            wrong = alphabet[RAND(rd, 0, A)];
-        } while (wrong == correct);
-        s += wrong;
+        s += (correct == kAbsentChar ? 'y' : kAbsentChar);
     } else {
         for (int l = 0; l < len; l++) {
             if (direction == 0)
@@ -246,7 +275,7 @@ static unsigned benchSeed(unsigned base, int scenario, int bucket, int mode) {
 }
 
 static void generateBenchmarkInputTree(const string& rootIn, unsigned baseSeed) {
-    const string alphabet = "abcdefghijklmnopqrstuvwxyz";
+    const string alphabet = kGridAlphabet;
     static const char* modeFiles[] = {"random.txt", "duplicate.txt", "spiral.txt"};
     const fs::path base = fs::path(rootIn);
 
@@ -370,8 +399,8 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
-    generateOneFile(mode, size, dictCount, outPath, ALPHABET, seed);
+    const string gridAlphabet = kGridAlphabet;
+    generateOneFile(mode, size, dictCount, outPath, gridAlphabet, seed);
 
     const char* names[] = {"random", "duplicate", "spiral"};
     cout << "OK: " << names[mode] << ", " << size << "x" << size << ", dict=" << dictCount << " -> " << outPath
