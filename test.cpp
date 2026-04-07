@@ -1,109 +1,380 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <fstream>
-#include <random>
 #include <algorithm>
+#include <cstdlib>
+#include <cstring>
 #include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <random>
+#include <string>
+#include <vector>
 
 using namespace std;
 namespace fs = std::filesystem;
 
-mt19937 rd(42); 
-int RAND(int l, int r) { return uniform_int_distribution<int>(l, r)(rd); }
+// Grid limits per assignment PDF: 1 ≤ R,C ≤ 1000. Official submissions often use K ≤ 100; our benchmark uses K up to 200.
+static const int kMaxGridDim = 1000;
+static const int kMaxDict = 200;
 
-vector<vector<char>> generateMasterGrid(int size, string alphabet) {
-    vector<vector<char>> grid(size, vector<char>(size));
-    for (int i = 0; i < size; i++)
-        for (int j = 0; j < size; j++)
-            grid[i][j] = alphabet[RAND(0, alphabet.size() - 1)];
+// Scenario 1: larger K hurts brute force more — each keyword scans the whole grid (horizontal + vertical),
+// and each start can compare up to the keyword length → total comparisons ~ Θ(K · N² · L) with L ≈ N.
+// Use the maximum benchmark K (200) to maximize total work within our input caps.
+static const int kBenchScenario1K = kMaxDict;
+static const int kBenchScenario2Grid = 250;
+
+static int RAND(mt19937& rd, int l, int r) { return uniform_int_distribution<int>(l, r)(rd); }
+
+vector<vector<char>> generateRandomGrid(int n, const string& alphabet, mt19937& rd) {
+    vector<vector<char>> grid(n, vector<char>(n));
+    const int A = (int)alphabet.size() - 1;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            grid[i][j] = alphabet[RAND(rd, 0, A)];
     return grid;
 }
 
-// Hàm sinh từ khóa: Hỗ trợ cả Ngang (0) và Dọc (1)
-string generateKeyword(const vector<vector<char>>& grid, int gridR, int gridC, string alphabet, int type, int minLen, int maxLen) {
-    int len = RAND(minLen, maxLen);
-    int direction = RAND(0, 1); // 0: Ngang, 1: Dọc
-    
+// Duplicate mode copies a contiguous horizontal segment seen earlier, not a single character:
+// - a segment on the same row to the left of the current cell, or
+// - a segment on the row above (that entire run is already filled).
+vector<vector<char>> generateDuplicateGrid(int n, const string& alphabet, mt19937& rd) {
+    vector<vector<char>> grid(n, vector<char>(n, '\0'));
+    const int A = (int)alphabet.size() - 1;
+    auto rndc = [&]() { return alphabet[RAND(rd, 0, A)]; };
+    const int kMaxCopiedRun = min(n, 32);
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n;) {
+            const int room = n - j;
+            bool pasted = false;
+            if (room >= 2 && RAND(rd, 0, 99) < 73) {
+                int maxL = min(room, kMaxCopiedRun);
+                for (int attempt = 0; attempt < 50 && !pasted; attempt++) {
+                    int L = RAND(rd, 2, maxL);
+                    int side = RAND(rd, 0, 1);
+                    if (side == 0 && j >= L) {
+                        int hi = j - L;
+                        int sc = RAND(rd, 0, hi);
+                        bool ok = true;
+                        for (int t = 0; t < L; t++) {
+                            if (grid[i][sc + t] == '\0') {
+                                ok = false;
+                                break;
+                            }
+                        }
+                        if (ok) {
+                            for (int t = 0; t < L; t++)
+                                grid[i][j + t] = grid[i][sc + t];
+                            j += L;
+                            pasted = true;
+                        }
+                    } else if (side == 1 && i > 0) {
+                        int hi = n - L;
+                        if (hi >= 0) {
+                            int sc = RAND(rd, 0, hi);
+                            bool ok = true;
+                            for (int t = 0; t < L; t++) {
+                                if (grid[i - 1][sc + t] == '\0') {
+                                    ok = false;
+                                    break;
+                                }
+                            }
+                            if (ok) {
+                                for (int t = 0; t < L; t++)
+                                    grid[i][j + t] = grid[i - 1][sc + t];
+                                j += L;
+                                pasted = true;
+                            }
+                        }
+                    }
+                }
+            }
+            if (!pasted) {
+                grid[i][j] = rndc();
+                j++;
+            }
+        }
+    }
+    return grid;
+}
+
+vector<vector<char>> generateSpiralGrid(int n, const string& alphabet, mt19937& rd) {
+    vector<vector<char>> grid(n, vector<char>(n));
+    const int A = (int)alphabet.size() - 1;
+    int top = 0, bottom = n - 1, left = 0, right = n - 1;
+    while (top <= bottom && left <= right) {
+        for (int j = left; j <= right; j++)
+            grid[top][j] = alphabet[RAND(rd, 0, A)];
+        top++;
+        for (int i = top; i <= bottom; i++)
+            grid[i][right] = alphabet[RAND(rd, 0, A)];
+        right--;
+        if (top <= bottom) {
+            for (int j = right; j >= left; j--)
+                grid[bottom][j] = alphabet[RAND(rd, 0, A)];
+            bottom--;
+        }
+        if (left <= right) {
+            for (int i = bottom; i >= top; i--)
+                grid[i][left] = alphabet[RAND(rd, 0, A)];
+            left++;
+        }
+    }
+    return grid;
+}
+
+vector<vector<char>> makeGrid(int mode, int n, const string& alphabet, mt19937& rd) {
+    switch (mode) {
+    case 0:
+        return generateRandomGrid(n, alphabet, rd);
+    case 1:
+        return generateDuplicateGrid(n, alphabet, rd);
+    case 2:
+        return generateSpiralGrid(n, alphabet, rd);
+    default:
+        return generateRandomGrid(n, alphabet, rd);
+    }
+}
+
+string generateKeyword(const vector<vector<char>>& grid, int gridR, int gridC, const string& alphabet, int type,
+                       int minLen, int maxLen, mt19937& rd) {
+    int len = RAND(rd, minLen, maxLen);
+    int direction = RAND(rd, 0, 1);
+
     int r, c;
-    if (direction == 0) { // Ngang
-        r = RAND(0, gridR - 1);
-        c = RAND(0, max(0, gridC - len));
-    } else { // Dọc
-        r = RAND(0, max(0, gridR - len));
-        c = RAND(0, gridC - 1);
+    if (direction == 0) {
+        r = RAND(rd, 0, gridR - 1);
+        c = RAND(rd, 0, max(0, gridC - len));
+    } else {
+        r = RAND(rd, 0, max(0, gridR - len));
+        c = RAND(rd, 0, gridC - 1);
     }
 
-    string s = "";
-    if (type == 0) { // Near-miss Not Found (Hard)
+    string s;
+    if (type == 0) {
         for (int l = 0; l < len - 1; l++) {
-            if (direction == 0) s += grid[r][c + l];
-            else s += grid[r + l][c];
+            if (direction == 0)
+                s += grid[r][c + l];
+            else
+                s += grid[r + l][c];
         }
         char wrong;
         char correct = (direction == 0) ? grid[r][c + len - 1] : grid[r + len - 1][c];
-        do { wrong = alphabet[RAND(0, alphabet.size() - 1)]; } while (wrong == correct);
+        const int A = (int)alphabet.size() - 1;
+        do {
+            wrong = alphabet[RAND(rd, 0, A)];
+        } while (wrong == correct);
         s += wrong;
-    } else { // Found
+    } else {
         for (int l = 0; l < len; l++) {
-            if (direction == 0) s += grid[r][c + l];
-            else s += grid[r + l][c];
+            if (direction == 0)
+                s += grid[r][c + l];
+            else
+                s += grid[r + l][c];
         }
     }
     return s;
 }
 
-vector<string> generateCumulativeDict(int totalCount, const vector<vector<char>>& grid, int gridR, int gridC, string alphabet, double minScale, double maxScale) {
+vector<string> generateCumulativeDict(int totalCount, const vector<vector<char>>& grid, int gridR, int gridC,
+                                      const string& alphabet, double minScale, double maxScale, mt19937& rd) {
     vector<string> dict;
     int minLen = (int)(gridC * minScale);
     int maxLen = (int)(gridC * maxScale);
-    if (minLen < 1) minLen = 1;
+    if (minLen < 1)
+        minLen = 1;
+    if (maxLen < minLen)
+        maxLen = minLen;
 
-    int notFound = totalCount * 0.3;
+    int notFound = (int)(totalCount * 0.3);
     int found = totalCount - notFound;
-    int hardFound = found * 0.8;
+    int hardFound = (int)(found * 0.8);
 
     vector<int> types;
-    for(int i=0; i<notFound; i++) types.push_back(0);
-    for(int i=0; i<hardFound; i++) types.push_back(1);
-    for(int i=0; i<(found - hardFound); i++) types.push_back(2);
+    for (int i = 0; i < notFound; i++)
+        types.push_back(0);
+    for (int i = 0; i < hardFound; i++)
+        types.push_back(1);
+    for (int i = 0; i < (found - hardFound); i++)
+        types.push_back(2);
     shuffle(types.begin(), types.end(), rd);
 
-    for(int type : types) {
-        dict.size() < totalCount ? dict.push_back(generateKeyword(grid, gridR, gridC, alphabet, type, minLen, maxLen)) : void();
+    for (int type : types) {
+        if ((int)dict.size() < totalCount)
+            dict.push_back(generateKeyword(grid, gridR, gridC, alphabet, type, minLen, maxLen, rd));
     }
     return dict;
 }
 
-void saveTest(string path, int r, int c, const vector<vector<char>>& masterGrid, const vector<string>& dict, int dictCount) {
-    fs::create_directories(fs::path(path).parent_path());
+void saveTest(const string& path, int r, int c, const vector<vector<char>>& masterGrid, const vector<string>& dict,
+              int dictCount) {
+    fs::path fp(path);
+    if (fp.has_parent_path() && !fp.parent_path().empty())
+        fs::create_directories(fp.parent_path());
     ofstream out(path);
+    if (!out) {
+        cerr << "Cannot write: " << path << "\n";
+        exit(1);
+    }
     out << r << " " << c << "\n";
     for (int i = 0; i < r; i++) {
-        for (int j = 0; j < c; j++) out << masterGrid[i][j] << (j == c - 1 ? "" : " ");
+        for (int j = 0; j < c; j++)
+            out << masterGrid[i][j] << (j == c - 1 ? "" : " ");
         out << "\n";
     }
     out << dictCount << "\n";
-    for (int i = 0; i < dictCount; i++) out << dict[i] << "\n";
-    out.close();
+    for (int i = 0; i < dictCount; i++)
+        out << dict[i] << "\n";
 }
 
-int main() {
+static void generateOneFile(int mode, int n, int dictCount, const string& path, const string& alphabet,
+                            unsigned seed) {
+    if (n > kMaxGridDim || n < 1) {
+        cerr << "Invalid grid size " << n << "\n";
+        exit(1);
+    }
+    if (dictCount < 1 || dictCount > kMaxDict) {
+        cerr << "Invalid dict " << dictCount << "\n";
+        exit(1);
+    }
+    mt19937 rd(seed);
+    vector<vector<char>> grid = makeGrid(mode, n, alphabet, rd);
+    auto dict = generateCumulativeDict(dictCount, grid, n, n, alphabet, 0.8, 1.0, rd);
+    saveTest(path, n, n, grid, dict, dictCount);
+}
+
+static unsigned benchSeed(unsigned base, int scenario, int bucket, int mode) {
+    return base + scenario * 1000000u + bucket * 10000u + (unsigned)mode;
+}
+
+static void generateBenchmarkInputTree(const string& rootIn, unsigned baseSeed) {
+    const string alphabet = "abcdefghijklmnopqrstuvwxyz";
+    static const char* modeFiles[] = {"random.txt", "duplicate.txt", "spiral.txt"};
+    const fs::path base = fs::path(rootIn);
+
+    const int s1sizes[] = {10, 250, 500, 1000};
+    for (int b = 0; b < 4; b++) {
+        int n = s1sizes[b];
+        for (int m = 0; m < 3; m++) {
+            fs::path out = base / "Scenario 1" / to_string(n) / modeFiles[m];
+            unsigned sd = benchSeed(baseSeed, 1, b, m);
+            generateOneFile(m, n, kBenchScenario1K, out.string(), alphabet, sd);
+            cout << "Wrote " << out.string() << "\n";
+        }
+    }
+
+    const int s2k[] = {10, 50, 100, 200};
+    int g = kBenchScenario2Grid;
+    for (int b = 0; b < 4; b++) {
+        int k = s2k[b];
+        for (int m = 0; m < 3; m++) {
+            fs::path out = base / "Scenario 2" / to_string(k) / modeFiles[m];
+            unsigned sd = benchSeed(baseSeed, 2, b, m);
+            generateOneFile(m, g, k, out.string(), alphabet, sd);
+            cout << "Wrote " << out.string() << "\n";
+        }
+    }
+}
+
+static void printUsage(const char* prog) {
+    cerr << "Usage:\n"
+         << "  " << prog << " --mode <random|duplicate|spiral> --size N --out <file> [--dict K] [--seed S]\n"
+         << "  " << prog << " -m <0|1|2> -n N -o <file> [--dict K] [--seed S]\n\n"
+         << "  " << prog << " --bench [--bench-root <dir>] [--seed S]\n"
+         << "      Generate the full Benchmark Test/Input tree:\n"
+         << "      Scenario 1: folders 10,250,500,1000 with 3 files each (random, duplicate, spiral), K="
+         << kBenchScenario1K << ".\n"
+         << "      Scenario 2: dict folders 10,50,100,200 with 3 files each, grid " << kBenchScenario2Grid << "x"
+         << kBenchScenario2Grid << ".\n\n"
+         << "Modes (single file):\n"
+         << "  random    (0), duplicate (1), spiral (2).\n\n"
+         << "Options:\n"
+         << "  --dict K      1.." << kMaxDict << " (default 50). Official PDF: K ≤ 100.\n"
+         << "  --seed S      RNG seed (default 42).\n"
+         << "  --bench-root  Root directory for Scenario 1/2 (default: Benchmark Test/Input).\n"
+         << "  -h, --help\n";
+}
+
+static bool parseMode(const string& s, int& modeOut) {
+    if (s == "0" || s == "random") {
+        modeOut = 0;
+        return true;
+    }
+    if (s == "1" || s == "duplicate") {
+        modeOut = 1;
+        return true;
+    }
+    if (s == "2" || s == "spiral") {
+        modeOut = 2;
+        return true;
+    }
+    return false;
+}
+
+int main(int argc, char* argv[]) {
+    string modeStr;
+    string outPath;
+    int size = 0;
+    int dictCount = 50;
+    unsigned seed = 42;
+    bool doBench = false;
+    string benchRoot = "Benchmark Test/Input";
+
+    for (int i = 1; i < argc; i++) {
+        string a = argv[i];
+        if (a == "-h" || a == "--help") {
+            printUsage(argv[0]);
+            return 0;
+        }
+        if (a == "--bench") {
+            doBench = true;
+            continue;
+        }
+        if (a == "--bench-root" && i + 1 < argc) {
+            benchRoot = argv[++i];
+            continue;
+        }
+        if ((a == "--mode" || a == "-m") && i + 1 < argc)
+            modeStr = argv[++i];
+        else if ((a == "--size" || a == "-n") && i + 1 < argc)
+            size = atoi(argv[++i]);
+        else if ((a == "--out" || a == "-o") && i + 1 < argc)
+            outPath = argv[++i];
+        else if (a == "--dict" && i + 1 < argc)
+            dictCount = atoi(argv[++i]);
+        else if (a == "--seed" && i + 1 < argc)
+            seed = (unsigned)strtoul(argv[++i], nullptr, 10);
+    }
+
+    if (doBench) {
+        generateBenchmarkInputTree(benchRoot, seed);
+        cout << "Benchmark input tree done under \"" << benchRoot << "\".\n";
+        return 0;
+    }
+
+    int mode = -1;
+    if (!modeStr.empty() && !parseMode(modeStr, mode)) {
+        cerr << "Unknown --mode: " << modeStr << "\n";
+        printUsage(argv[0]);
+        return 1;
+    }
+    if (mode < 0 || size <= 0 || outPath.empty()) {
+        cerr << "Missing arguments. Use --bench or (--mode, --size, --out).\n\n";
+        printUsage(argv[0]);
+        return 1;
+    }
+    if (size > kMaxGridDim) {
+        cerr << "Error: --size must be <= " << kMaxGridDim << ".\n";
+        return 1;
+    }
+    if (dictCount < 1 || dictCount > kMaxDict) {
+        cerr << "Error: --dict K must satisfy 1 <= K <= " << kMaxDict << ".\n";
+        return 1;
+    }
+
     string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
-    auto masterGrid = generateMasterGrid(500, ALPHABET);
+    generateOneFile(mode, size, dictCount, outPath, ALPHABET, seed);
 
-    // Scenario 1: Fix Dict 250, Vary Grid
-    auto s1_master_dict = generateCumulativeDict(250, masterGrid, 10, 10, ALPHABET, 0.8, 1.0);
-    saveTest("Input/Scenario 1/small.txt", 10, 10, masterGrid, s1_master_dict, 250);
-    saveTest("Input/Scenario 1/medium.txt", 250, 250, masterGrid, s1_master_dict, 250);
-    saveTest("Input/Scenario 1/large.txt", 500, 500, masterGrid, s1_master_dict, 250);
-
-    // Scenario 2: Fix Grid 250, Vary Dict
-    auto s2_master_dict = generateCumulativeDict(500, masterGrid, 250, 250, ALPHABET, 0.8, 1.0);
-    saveTest("Input/Scenario 2/small.txt", 250, 250, masterGrid, s2_master_dict, 10);
-    saveTest("Input/Scenario 2/medium.txt", 250, 250, masterGrid, s2_master_dict, 250);
-    saveTest("Input/Scenario 2/large.txt", 250, 250, masterGrid, s2_master_dict, 500);
-
-    cout << "Success: Generated cross-directional (Horiz/Vert) cumulative tests." << endl;
+    const char* names[] = {"random", "duplicate", "spiral"};
+    cout << "OK: " << names[mode] << ", " << size << "x" << size << ", dict=" << dictCount << " -> " << outPath
+         << "\n";
     return 0;
 }
