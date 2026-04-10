@@ -38,70 +38,6 @@ vector<vector<char>> generateRandomGrid(int n, const string& alphabet, mt19937& 
     return grid;
 }
 
-// Duplicate mode copies a contiguous horizontal segment seen earlier, not a single character:
-// - a segment on the same row to the left of the current cell, or
-// - a segment on the row above (that entire run is already filled).
-vector<vector<char>> generateDuplicateGrid(int n, const string& alphabet, mt19937& rd) {
-    vector<vector<char>> grid(n, vector<char>(n, '\0'));
-    const int A = (int)alphabet.size() - 1;
-    auto rndc = [&]() { return alphabet[RAND(rd, 0, A)]; };
-    const int kMaxCopiedRun = min(n, 32);
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n;) {
-            const int room = n - j;
-            bool pasted = false;
-            if (room >= 2 && RAND(rd, 0, 99) < 73) {
-                int maxL = min(room, kMaxCopiedRun);
-                for (int attempt = 0; attempt < 50 && !pasted; attempt++) {
-                    int L = RAND(rd, 2, maxL);
-                    int side = RAND(rd, 0, 1);
-                    if (side == 0 && j >= L) {
-                        int hi = j - L;
-                        int sc = RAND(rd, 0, hi);
-                        bool ok = true;
-                        for (int t = 0; t < L; t++) {
-                            if (grid[i][sc + t] == '\0') {
-                                ok = false;
-                                break;
-                            }
-                        }
-                        if (ok) {
-                            for (int t = 0; t < L; t++)
-                                grid[i][j + t] = grid[i][sc + t];
-                            j += L;
-                            pasted = true;
-                        }
-                    } else if (side == 1 && i > 0) {
-                        int hi = n - L;
-                        if (hi >= 0) {
-                            int sc = RAND(rd, 0, hi);
-                            bool ok = true;
-                            for (int t = 0; t < L; t++) {
-                                if (grid[i - 1][sc + t] == '\0') {
-                                    ok = false;
-                                    break;
-                                }
-                            }
-                            if (ok) {
-                                for (int t = 0; t < L; t++)
-                                    grid[i][j + t] = grid[i - 1][sc + t];
-                                j += L;
-                                pasted = true;
-                            }
-                        }
-                    }
-                }
-            }
-            if (!pasted) {
-                grid[i][j] = rndc();
-                j++;
-            }
-        }
-    }
-    return grid;
-}
-
 vector<vector<char>> generateSpiralGrid(int n, const string& alphabet, mt19937& rd) {
     // Spiral mode should be measurably different from random for horizontal/vertical searches.
     // We fill the grid in spiral layers, but each layer uses a fixed character (cycling over a
@@ -157,8 +93,6 @@ vector<vector<char>> makeGrid(int mode, int n, const string& alphabet, mt19937& 
     case 0:
         return generateRandomGrid(n, alphabet, rd);
     case 1:
-        return generateDuplicateGrid(n, alphabet, rd);
-    case 2:
         return generateSpiralGrid(n, alphabet, rd);
     default:
         return generateRandomGrid(n, alphabet, rd);
@@ -276,13 +210,13 @@ static unsigned benchSeed(unsigned base, int scenario, int bucket, int mode) {
 
 static void generateBenchmarkInputTree(const string& rootIn, unsigned baseSeed) {
     const string alphabet = kGridAlphabet;
-    static const char* modeFiles[] = {"random.txt", "duplicate.txt", "spiral.txt"};
+    static const char* modeFiles[] = {"random.txt", "spiral.txt"};
     const fs::path base = fs::path(rootIn);
 
     const int s1sizes[] = {10, 250, 500, 1000};
     for (int b = 0; b < 4; b++) {
         int n = s1sizes[b];
-        for (int m = 0; m < 3; m++) {
+        for (int m = 0; m < 2; m++) {
             fs::path out = base / "Scenario 1" / to_string(n) / modeFiles[m];
             unsigned sd = benchSeed(baseSeed, 1, b, m);
             generateOneFile(m, n, kBenchScenario1K, out.string(), alphabet, sd);
@@ -294,7 +228,7 @@ static void generateBenchmarkInputTree(const string& rootIn, unsigned baseSeed) 
     int g = kBenchScenario2Grid;
     for (int b = 0; b < 4; b++) {
         int k = s2k[b];
-        for (int m = 0; m < 3; m++) {
+        for (int m = 0; m < 2; m++) {
             fs::path out = base / "Scenario 2" / to_string(k) / modeFiles[m];
             unsigned sd = benchSeed(baseSeed, 2, b, m);
             generateOneFile(m, g, k, out.string(), alphabet, sd);
@@ -305,16 +239,16 @@ static void generateBenchmarkInputTree(const string& rootIn, unsigned baseSeed) 
 
 static void printUsage(const char* prog) {
     cerr << "Usage:\n"
-         << "  " << prog << " --mode <random|duplicate|spiral> --size N --out <file> [--dict K] [--seed S]\n"
-         << "  " << prog << " -m <0|1|2> -n N -o <file> [--dict K] [--seed S]\n\n"
+         << "  " << prog << " --mode <random|spiral> --size N --out <file> [--dict K] [--seed S]\n"
+         << "  " << prog << " -m <0|1> -n N -o <file> [--dict K] [--seed S]\n\n"
          << "  " << prog << " --bench [--bench-root <dir>] [--seed S]\n"
          << "      Generate the full Benchmark Test/Input tree:\n"
-         << "      Scenario 1: folders 10,250,500,1000 with 3 files each (random, duplicate, spiral), K="
+         << "      Scenario 1: folders 10,250,500,1000 with 2 files each (random, spiral), K="
          << kBenchScenario1K << ".\n"
-         << "      Scenario 2: dict folders 10,50,100,200 with 3 files each, grid " << kBenchScenario2Grid << "x"
+         << "      Scenario 2: dict folders 10,50,100,200 with 2 files each, grid " << kBenchScenario2Grid << "x"
          << kBenchScenario2Grid << ".\n\n"
          << "Modes (single file):\n"
-         << "  random    (0), duplicate (1), spiral (2).\n\n"
+         << "  random    (0), spiral (1).\n\n"
          << "Options:\n"
          << "  --dict K      1.." << kMaxDict << " (default 50). Official PDF: K ≤ 100.\n"
          << "  --seed S      RNG seed (default 42).\n"
@@ -327,12 +261,8 @@ static bool parseMode(const string& s, int& modeOut) {
         modeOut = 0;
         return true;
     }
-    if (s == "1" || s == "duplicate") {
+    if (s == "1" || s == "spiral") {
         modeOut = 1;
-        return true;
-    }
-    if (s == "2" || s == "spiral") {
-        modeOut = 2;
         return true;
     }
     return false;
@@ -402,7 +332,7 @@ int main(int argc, char* argv[]) {
     const string gridAlphabet = kGridAlphabet;
     generateOneFile(mode, size, dictCount, outPath, gridAlphabet, seed);
 
-    const char* names[] = {"random", "duplicate", "spiral"};
+    const char* names[] = {"random", "spiral"};
     cout << "OK: " << names[mode] << ", " << size << "x" << size << ", dict=" << dictCount << " -> " << outPath
          << "\n";
     return 0;
