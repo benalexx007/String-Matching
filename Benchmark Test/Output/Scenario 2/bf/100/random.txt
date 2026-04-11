@@ -101,4 +101,4 @@ nbenpkjxbyougkygeysanxvirawtykhecvskdaqtoilwkfcwiymweihtroahxovwqvhneldqjjikoduk
 -----------------------------------
 Algorithm: Brute Force
 Comparisons: 1269722
-Execution Time: 47.8647ms
+Execution Time: 46.37ms

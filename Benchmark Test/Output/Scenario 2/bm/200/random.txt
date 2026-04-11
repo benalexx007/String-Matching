@@ -201,4 +201,4 @@ nhsdrfcqoegcihvkuqfejrxmoyqyrllsfrrcdmtidsampbcaqrcypsmkqpcopwluvevtnlfktjnqrjhk
 -----------------------------------
 Algorithm: Boyer-Moore
 Comparisons: 45408301
-Execution Time: 1329.96ms
+Execution Time: 1517.27ms

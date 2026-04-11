@@ -101,4 +101,4 @@ nbenpkjxbyougkygeysanxvirawtykhecvskdaqtoilwkfcwiymweihtroahxovwqvhneldqjjikoduk
 -----------------------------------
 Algorithm: KMP
 Comparisons: 24741800
-Execution Time: 440.382ms
+Execution Time: 544.986ms

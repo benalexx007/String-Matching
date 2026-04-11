@@ -201,4 +201,4 @@ ejilkvobug: (0, 5) -> (9, 5); (0, 5) -> (9, 5); (0, 5) -> (9, 5); (0, 5) -> (9, 
 -----------------------------------
 Algorithm: KMP
 Comparisons: 75128
-Execution Time: 3.531ms
+Execution Time: 3.6618ms

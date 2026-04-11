@@ -51,4 +51,4 @@ nefefagwcdnnsqidjqgkbtyaofauucudfvsrjowgoltqonakdecmffbmpceaictsimpkkbsryyuwyuuc
 -----------------------------------
 Algorithm: Boyer-Moore
 Comparisons: 11195280
-Execution Time: 383.125ms
+Execution Time: 360.666ms

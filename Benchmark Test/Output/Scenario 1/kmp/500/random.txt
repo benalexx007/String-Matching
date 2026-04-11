@@ -201,4 +201,4 @@ binbhgditqkpggtxmnqhlkwhmgnueojnftqghxawxwagssnkyrlyudnnckwrhhbspjfhhggutbboyqjk
 -----------------------------------
 Algorithm: KMP
 Comparisons: 197339163
-Execution Time: 3995.61ms
+Execution Time: 4480.62ms

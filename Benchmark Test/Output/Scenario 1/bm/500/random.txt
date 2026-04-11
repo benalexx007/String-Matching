@@ -201,4 +201,4 @@ binbhgditqkpggtxmnqhlkwhmgnueojnftqghxawxwagssnkyrlyudnnckwrhhbspjfhhggutbboyqjk
 -----------------------------------
 Algorithm: Boyer-Moore
 Comparisons: 180261493
-Execution Time: 6328.05ms
+Execution Time: 6780.76ms

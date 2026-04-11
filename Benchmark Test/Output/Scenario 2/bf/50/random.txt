@@ -51,4 +51,4 @@ nefefagwcdnnsqidjqgkbtyaofauucudfvsrjowgoltqonakdecmffbmpceaictsimpkkbsryyuwyuuc
 -----------------------------------
 Algorithm: Brute Force
 Comparisons: 733409
-Execution Time: 24.6621ms
+Execution Time: 27.5116ms

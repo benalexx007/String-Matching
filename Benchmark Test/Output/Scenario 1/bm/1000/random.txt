@@ -201,4 +201,4 @@ repjdgnlscyabltktjbiyagtgxoevjglgkuyqmtpxxlhfrabbknewsmgrmrfkcvrhesvuciocqdcrwdl
 -----------------------------------
 Algorithm: Boyer-Moore
 Comparisons: 722183388
-Execution Time: 23875.1ms
+Execution Time: 26873ms

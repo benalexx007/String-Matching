@@ -51,4 +51,4 @@ nefefagwcdnnsqidjqgkbtyaofauucudfvsrjowgoltqonakdecmffbmpceaictsimpkkbsryyuwyuuc
 -----------------------------------
 Algorithm: Z-function
 Comparisons: 501803
-Execution Time: 419.925ms
+Execution Time: 460.284ms

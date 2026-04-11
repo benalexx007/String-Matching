@@ -101,4 +101,4 @@ nbenpkjxbyougkygeysanxvirawtykhecvskdaqtoilwkfcwiymweihtroahxovwqvhneldqjjikoduk
 -----------------------------------
 Algorithm: Boyer-Moore
 Comparisons: 22761358
-Execution Time: 672.189ms
+Execution Time: 991.329ms

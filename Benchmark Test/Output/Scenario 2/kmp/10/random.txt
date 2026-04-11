@@ -11,4 +11,4 @@ htwdbuaossafxxbajivyqeqxrqcbuetgwewhdtetygmfkmchvydgiqotbphhhptqsgkkhxmuylydklfv
 -----------------------------------
 Algorithm: KMP
 Comparisons: 2443275
-Execution Time: 46.1725ms
+Execution Time: 55.4538ms

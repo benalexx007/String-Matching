@@ -201,4 +201,4 @@ binbhgditqkpggtxmnqhlkwhmgnueojnftqghxawxwagssnkyrlyudnnckwrhhbspjfhhggutbboyqjk
 -----------------------------------
 Algorithm: Brute Force
 Comparisons: 10768666
-Execution Time: 297.099ms
+Execution Time: 357.719ms

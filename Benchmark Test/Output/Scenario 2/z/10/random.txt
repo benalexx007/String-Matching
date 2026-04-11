@@ -11,4 +11,4 @@ htwdbuaossafxxbajivyqeqxrqcbuetgwewhdtetygmfkmchvydgiqotbphhhptqsgkkhxmuylydklfv
 -----------------------------------
 Algorithm: Z-function
 Comparisons: 94399
-Execution Time: 84.5261ms
+Execution Time: 95.7491ms
