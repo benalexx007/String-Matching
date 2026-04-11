@@ -201,4 +201,4 @@ ejilkvobug: (0, 5) -> (9, 5); (0, 5) -> (9, 5); (0, 5) -> (9, 5); (0, 5) -> (9, 
 -----------------------------------
 Algorithm: Boyer-Moore
 Comparisons: 76420
-Execution Time: 10.9631ms
+Execution Time: 10.6818ms

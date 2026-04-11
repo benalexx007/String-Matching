@@ -11,4 +11,4 @@ htwdbuaossafxxbajivyqeqxrqcbuetgwewhdtetygmfkmchvydgiqotbphhhptqsgkkhxmuylydklfv
 -----------------------------------
 Algorithm: Boyer-Moore
 Comparisons: 2225464
-Execution Time: 70.6778ms
+Execution Time: 77.0068ms

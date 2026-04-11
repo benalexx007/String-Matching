@@ -201,4 +201,4 @@ repjdgnlscyabltktjbiyagtgxoevjglgkuyqmtpxxlhfrabbknewsmgrmrfkcvrhesvuciocqdcrwdl
 -----------------------------------
 Algorithm: Brute Force
 Comparisons: 41760158
-Execution Time: 957.07ms
+Execution Time: 1259.58ms

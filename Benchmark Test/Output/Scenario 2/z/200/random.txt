@@ -201,4 +201,4 @@ nhsdrfcqoegcihvkuqfejrxmoyqyrllsfrrcdmtidsampbcaqrcypsmkqpcopwluvevtnlfktjnqrjhk
 -----------------------------------
 Algorithm: Z-function
 Comparisons: 2013585
-Execution Time: 1766.53ms
+Execution Time: 1843.17ms

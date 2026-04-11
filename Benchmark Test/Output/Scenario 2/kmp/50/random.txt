@@ -51,4 +51,4 @@ nefefagwcdnnsqidjqgkbtyaofauucudfvsrjowgoltqonakdecmffbmpceaictsimpkkbsryyuwyuuc
 -----------------------------------
 Algorithm: KMP
 Comparisons: 12274811
-Execution Time: 223.696ms
+Execution Time: 253.269ms

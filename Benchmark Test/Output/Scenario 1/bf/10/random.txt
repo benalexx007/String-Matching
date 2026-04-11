@@ -201,4 +201,4 @@ ejilkvobug: (0, 5) -> (9, 5); (0, 5) -> (9, 5); (0, 5) -> (9, 5); (0, 5) -> (9, 
 -----------------------------------
 Algorithm: Brute Force
 Comparisons: 10077
-Execution Time: 1.3349ms
+Execution Time: 2.2089ms

@@ -201,4 +201,4 @@ nhsdrfcqoegcihvkuqfejrxmoyqyrllsfrrcdmtidsampbcaqrcypsmkqpcopwluvevtnlfktjnqrjhk
 -----------------------------------
 Algorithm: KMP
 Comparisons: 49434166
-Execution Time: 870.991ms
+Execution Time: 1006.46ms

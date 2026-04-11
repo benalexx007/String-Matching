@@ -201,4 +201,4 @@ whojtjmlfaeuunfhyrlxujxbtycouuufmqhsbcwixolsqaofwjnepiaffwbngdxvfxfprqnwptujijyi
 -----------------------------------
 Algorithm: Brute Force
 Comparisons: 2642002
-Execution Time: 165.349ms
+Execution Time: 117.354ms

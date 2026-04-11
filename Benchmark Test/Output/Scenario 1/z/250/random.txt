@@ -201,4 +201,4 @@ whojtjmlfaeuunfhyrlxujxbtycouuufmqhsbcwixolsqaofwjnepiaffwbngdxvfxfprqnwptujijyi
 -----------------------------------
 Algorithm: Z-function
 Comparisons: 1992185
-Execution Time: 2296.94ms
+Execution Time: 1913.02ms

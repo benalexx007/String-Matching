@@ -11,4 +11,4 @@ htwdbuaossafxxbajivyqeqxrqcbuetgwewhdtetygmfkmchvydgiqotbphhhptqsgkkhxmuylydklfv
 -----------------------------------
 Algorithm: Brute Force
 Comparisons: 153677
-Execution Time: 7.3241ms
+Execution Time: 7.9789ms

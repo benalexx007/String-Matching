@@ -201,4 +201,4 @@ nhsdrfcqoegcihvkuqfejrxmoyqyrllsfrrcdmtidsampbcaqrcypsmkqpcopwluvevtnlfktjnqrjhk
 -----------------------------------
 Algorithm: Brute Force
 Comparisons: 2597130
-Execution Time: 87.489ms
+Execution Time: 86.3704ms

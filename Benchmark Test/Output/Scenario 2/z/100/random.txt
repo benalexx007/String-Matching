@@ -101,4 +101,4 @@ nbenpkjxbyougkygeysanxvirawtykhecvskdaqtoilwkfcwiymweihtroahxovwqvhneldqjjikoduk
 -----------------------------------
 Algorithm: Z-function
 Comparisons: 1007656
-Execution Time: 853.241ms
+Execution Time: 923.441ms

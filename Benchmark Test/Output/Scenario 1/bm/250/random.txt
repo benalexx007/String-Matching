@@ -201,4 +201,4 @@ whojtjmlfaeuunfhyrlxujxbtycouuufmqhsbcwixolsqaofwjnepiaffwbngdxvfxfprqnwptujijyi
 -----------------------------------
 Algorithm: Boyer-Moore
 Comparisons: 45320900
-Execution Time: 1907.72ms
+Execution Time: 1957.49ms

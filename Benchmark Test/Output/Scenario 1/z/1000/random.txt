@@ -201,4 +201,4 @@ repjdgnlscyabltktjbiyagtgxoevjglgkuyqmtpxxlhfrabbknewsmgrmrfkcvrhesvuciocqdcrwdl
 -----------------------------------
 Algorithm: Z-function
 Comparisons: 31712405
-Execution Time: 31174.4ms
+Execution Time: 40651.3ms

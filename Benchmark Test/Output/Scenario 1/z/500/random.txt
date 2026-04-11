@@ -201,4 +201,4 @@ binbhgditqkpggtxmnqhlkwhmgnueojnftqghxawxwagssnkyrlyudnnckwrhhbspjfhhggutbboyqjk
 -----------------------------------
 Algorithm: Z-function
 Comparisons: 8010460
-Execution Time: 11028ms
+Execution Time: 8726.88ms

@@ -201,4 +201,4 @@ whojtjmlfaeuunfhyrlxujxbtycouuufmqhsbcwixolsqaofwjnepiaffwbngdxvfxfprqnwptujijyi
 -----------------------------------
 Algorithm: KMP
 Comparisons: 49378523
-Execution Time: 1191.66ms
+Execution Time: 1083.58ms

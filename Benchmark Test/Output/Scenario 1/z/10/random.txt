@@ -201,4 +201,4 @@ ejilkvobug: (0, 5) -> (9, 5); (0, 5) -> (9, 5); (0, 5) -> (9, 5); (0, 5) -> (9, 
 -----------------------------------
 Algorithm: Z-function
 Comparisons: 5325
-Execution Time: 8.3124ms
+Execution Time: 7.8308ms

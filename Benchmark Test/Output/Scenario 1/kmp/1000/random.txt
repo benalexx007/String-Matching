@@ -201,4 +201,4 @@ repjdgnlscyabltktjbiyagtgxoevjglgkuyqmtpxxlhfrabbknewsmgrmrfkcvrhesvuciocqdcrwdl
 -----------------------------------
 Algorithm: KMP
 Comparisons: 790355694
-Execution Time: 16898.6ms
+Execution Time: 17851ms
