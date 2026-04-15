@@ -50,7 +50,7 @@ A high-performance command-line tool for locating keywords inside a two-dimensio
 ## Project Structure
 
 ```
-.
+source/
 ├── file1.cpp                   # Main entry point (CLI argument parsing)
 ├── Algorithm/
 │   ├── library.h               # Shared headers, data structures & declarations
@@ -130,6 +130,8 @@ crossword.exe -a kmp -i "tests/Input/Scenario 1/250/random.txt" -o output.txt
 crossword.exe -a rk -i "tests/Input/Scenario 1/1000/spiral.txt" -o results.txt
 ```
 
+> On Linux/macOS, replace `crossword.exe` with `./crossword`. On PowerShell, replace `crossword.exe` with `.\crossword.exe`.
+
 ---
 
 ## Input Format
@@ -195,7 +197,7 @@ The test suite includes two benchmark scenarios designed to evaluate algorithm s
 Fixed dictionary size, grid dimensions vary: **10×10**, **250×250**, **500×500**, **1000×1000**
 
 Two spatial distributions per size:
-- `random.txt` — uniformly sampled printable ASCII (|Σ|=95), exercises average-case behavior
+- `random.txt` — uniformly sampled printable ASCII (|Σ|=26), exercises average-case behavior
 - `spiral.txt` — deterministic spiral fill with restricted alphabet (|Σ|≤4), near-worst-case stress test
 
 ### Scenario 2 — Dictionary Scaling
@@ -203,15 +205,6 @@ Two spatial distributions per size:
 Fixed grid dimension, keyword count varies: **10**, **50**, **100**, **200**
 
 Same dual distributions (`random` + `spiral`) per configuration.
-
-### Running a Full Benchmark
-
-```bash
-# Scenario 1: Grid size 500, random distribution, all algorithms
-for algo in bf kmp bm rk z; do
-    crossword.exe -a $algo -i "tests/Input/Scenario 1/500/random.txt" -o "tests/Output/Scenario 1/$algo/500/random.txt"
-done
-```
 
 ### Key Findings (N = 1000)
 
@@ -235,9 +228,6 @@ g++ file1.cpp Algorithm/bf.cpp Algorithm/bm.cpp Algorithm/kmp.cpp Algorithm/rk.c
 
 # 2. Run
 crossword.exe -a z -i puzzle.txt -o solution.txt
-
-# 3. View results
-cat solution.txt
 ```
 
 **Output:**
