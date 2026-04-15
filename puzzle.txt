@@ -1,0 +1,8 @@
+4 4
+t e s t
+e a b c
+s d e f
+t g h i
+2
+test
+bug

@@ -1,0 +1,6 @@
+test: (0, 0) -> (0, 3); (0, 0) -> (3, 0); 
+bug: not found
+-----------------------------------
+Algorithm: Z-function
+Comparisons: 20
+Execution Time: 0.2555ms

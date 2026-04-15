@@ -5,7 +5,7 @@ using namespace std;
 int main(int argc, char* argv[]){
     unordered_map<string, function<vector<pair<int, int>>(string toSearch, string target, string& name, int& cmp_cnt)>> 
         algorithms {{"z", z}, {"kmp", kmp}, {"bm", bm}, {"bf", bf}, {"rk", rk}};
-    string in, out, algo;
+    string in = "./puzzle.txt", out = "./solution.txt", algo;
     for(int i=1; i<argc; ++i){
         string arg = argv[i];
         if(arg == "-a" && i + 1 < argc)
