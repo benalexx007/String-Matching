@@ -5,6 +5,8 @@
 
 A high-performance command-line tool for locating keywords inside a two-dimensional character grid. The program searches **horizontally** (left → right) and **vertically** (top → bottom), supporting five distinct string-matching algorithms with built-in benchmarking.
 
+GitHub: https://github.com/benalexx007/String-Matching
+
 ---
 
 ## Table of Contents
